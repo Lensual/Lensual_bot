@@ -60,7 +60,7 @@ function TgBot(token) {
 
     //加载模块
     this.LoadModule = async function (module) {
-        module.updateListener(event);
+        new module().updateListener(thisBot.event);
     }
 
     /****************

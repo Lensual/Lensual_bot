@@ -15,11 +15,11 @@ async function main() {
     console.log("Login OK");
     console.log(bot.Me);
 
-    //接收消息事件
+    //接收消息事件 //TO Delete
     bot.event.on("newUpdate", function (update) {
         console.log(update);
         //复读机模式
-        bot.apiMethod("sendMessage", { chat_id: update.message.chat.id, text: update.message.text });
+        //bot.apiMethod("sendMessage", { chat_id: update.message.chat.id, text: update.message.text });
     });
     //加载模块
     var modsPath = "./Modules/";
