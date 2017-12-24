@@ -24,7 +24,7 @@ function TgBot(token) {
 
     //Login
     this.LoginSync = async function () {
-        var json = await thisBot.getMe();
+        var json = await thisBot.apiMethod("getMe");
         if (json && json.ok) {
             thisBot.Me = json;
             return json;
@@ -38,15 +38,9 @@ function TgBot(token) {
         if (thisBot.Status === "UP") return;
         switch (updateMethod.method) {
             case "polling":
-                //先清除历史消息
-                var updates = await thisBot.getUpdates(0, 0);
-                var offset = 0;
-                if (updates.result.length > 0) {
-                    for (var i = 0; i < updates.result.length; i++) {
-                        if (updates.result[i].update_id > offset) offset = updates.result[i].update_id;
-                    }
-                    offset++;
-                }
+                //获取最后update_id
+                var lastUpdate = await thisBot.apiMethod("getUpdates", { offset: -1, timeout: 0 });
+                if (lastUpdate.result.length) var offset = lastUpdate.result[0].update_id + 1;
                 //开始工作
                 thisBot.Status = "UP";
                 updatePolling(offset, updateMethod.timeout);
@@ -69,7 +63,7 @@ function TgBot(token) {
 
     //消息更新轮询
     async function updatePolling(offset, timeout) {
-        var updates = await thisBot.getUpdates(offset, timeout);
+        var updates = await thisBot.apiMethod("getUpdates", { offset: offset, timeout: timeout });
         if (updates.ok && thisBot.Status === "UP") {
             //触发事件
             for (var i = 0; i < updates.result.length; i++) {
@@ -85,11 +79,6 @@ function TgBot(token) {
         }
         if (thisBot.Status === "UP") setImmediate(updatePolling, offset, timeout);
     }
-
-    ////获取最新消息
-    //async function getLastUpdate() {
-
-    //}
 
     //http Helper
     function httpPost(method, callback, apiParams = {}) {
@@ -119,25 +108,12 @@ function TgBot(token) {
         req.end();
     }
 
-    /****************
-    API方法
-    *****************/
-
-    //消息轮询
-    this.getUpdates = function (offset = 0, timeout = 0) {
+    //API方法
+    this.apiMethod = function (method, args) {
         return new Promise(function (resolve, reject) {
-            httpPost("getUpdates", function (json) {
+            httpPost(method, function (json) {
                 resolve(json);
-            }, { offset: offset, timeout: timeout });
-        });
-    }
-
-    //获取自身 User Object
-    this.getMe = function () {
-        return new Promise(function (resolve, reject) {
-            httpPost("getMe", function (json) {
-                resolve(json);
-            });
+            },args);
         });
     }
 }
