@@ -39,8 +39,9 @@ function TgBot(token) {
         switch (updateMethod.method) {
             case "polling":
                 //获取最后update_id
+                var offset = 0;
                 var lastUpdate = await thisBot.apiMethod("getUpdates", { offset: -1, timeout: 0 });
-                if (lastUpdate.result.length) var offset = lastUpdate.result[0].update_id + 1;
+                if (lastUpdate.result.length) offset = lastUpdate.result[0].update_id + 1;
                 //开始工作
                 thisBot.Status = "UP";
                 updatePolling(offset, updateMethod.timeout);

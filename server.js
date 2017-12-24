@@ -16,7 +16,9 @@ async function main() {
 
     //接收消息事件
     bot.event.on("newUpdate", function (update) {
-        console.log(update);
+        console.log(update); 
+        //复读机模式
+        bot.apiMethod("sendMessage", { chat_id: update.message.chat.id, text: update.message.text });
     });
     bot.Start(config.updateMethod);
     console.log("Bot Working");
