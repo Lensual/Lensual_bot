@@ -1,4 +1,5 @@
 const TgBot = require("./TgBot");
+const fs = require("fs");
 var config = require("./config");
 
 var bot = new TgBot(config.token);
@@ -16,10 +17,17 @@ async function main() {
 
     //接收消息事件
     bot.event.on("newUpdate", function (update) {
-        console.log(update); 
+        console.log(update);
         //复读机模式
         bot.apiMethod("sendMessage", { chat_id: update.message.chat.id, text: update.message.text });
     });
+    //加载模块
+    var modsPath = "./Modules/";
+    var mods = fs.readdirSync(modsPath);
+    for (var i = 0; i < mods.length; i++) {
+        bot.LoadModule(require(modsPath + mods[i]));
+    }
+    //开始工作
     bot.Start(config.updateMethod);
     console.log("Bot Working");
 }

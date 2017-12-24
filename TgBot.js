@@ -58,6 +58,11 @@ function TgBot(token) {
         thisBot.Status = "Down";
     }
 
+    //加载模块
+    this.LoadModule = async function (module) {
+        module.updateListener(event);
+    }
+
     /****************
     Helper
     *****************/
