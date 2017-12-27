@@ -16,7 +16,8 @@ function TgBot(token) {
     this.proxy = "";
     this.Me = {};
     this.Status = "Down";
-    this.event = new EventEmitter();
+    this.event = new EventEmitter();      //todo 继承
+    this.event.bot = this;
 
     /****************
     高级方法
@@ -60,7 +61,8 @@ function TgBot(token) {
 
     //加载模块
     this.LoadModule = async function (module) {
-        new module().updateListener(thisBot.event);
+        var m = new module();
+        m.updateListener(thisBot.event);
     }
 
     /****************
@@ -71,9 +73,21 @@ function TgBot(token) {
     async function updatePolling(offset, timeout) {
         var updates = await thisBot.apiMethod("getUpdates", { offset: offset, timeout: timeout });
         if (updates.ok && thisBot.Status === "UP") {
-            //触发事件
+            //newUpdates事件
+            thisBot.event.emit("newUpdates", updates);
+            //newUpdate事件
             for (var i = 0; i < updates.result.length; i++) {
                 thisBot.event.emit("newUpdate", updates.result[i]);
+                if (updates.result[i].message) {
+                    //newMsg Event
+                    thisBot.event.emit("newMsg", updates.result[i].message);
+                } else if (updates.result[i].edited_message) {
+                    //newEditedMsg Event
+                    thisBot.event.emit("newEditedMsg", updates.result[i].edited_message);
+                } else if (updates.result[i].channel_post) {
+                    //newChnPost Event
+                    thisBot.event.emit("newChnPost", updates.result[i].channel_post);
+                }
             }
             //更新offset
             if (updates.result.length > 0) {
@@ -87,39 +101,56 @@ function TgBot(token) {
     }
 
     //http Helper
-    function httpPost(method, callback, apiParams = {}) {
+    function httpPost(method, callback, apiParams = {}, inputFiles) {
         var opts = url.parse(apiUrl + token + "/" + method);
-        var postData = querystring.stringify(apiParams);
         //proxy TODO:http https
         if (thisBot.proxy) {
             opts.agent = new SocksProxyAgent(thisBot.proxy, true);
         }
         opts.method = "POST";
-        opts.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(postData)
-        };
+        if (inputFiles) {
+            opts.headers = { 'Content-Type': 'multipart/form-data; boundary="----boundary"' };
+            opts.path += "?" + querystring.stringify(apiParams);
+        } else {
+            var postData = querystring.stringify(apiParams);
+            opts.headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(postData)
+            };
+        }
         var req = https.request(opts, function (res) {
-            //if (res.statusCode !== 200) throw new Error();
             var rawData = "";
             res.on("data", function (chunk) { rawData += chunk; });
             res.on("end", function () {
                 callback(JSON.parse(rawData));
+                console.log(rawData);
             });
         });
         req.on('error', (e) => {
             console.error(`请求遇到问题: ${e.message}`);
         });
-        req.write(postData);
+        //发送数据
+        if (inputFiles) {
+            for (var i = 0; i < inputFiles.length; i++) {
+                req.write("------boundary\r\n");
+                req.write(`Content-Disposition: form-data; name="photo"; filename="file${i}"\r\n`);
+                req.write("Content-Type: application/octet-stream\r\n");
+                req.write("Content-Transfer-Encoding: binary\r\n\r\n");
+                req.write(inputFiles[i]);
+                req.write("\r\n------boundary--");
+            }
+        } else {
+            req.write(postData);
+        }
         req.end();
     }
 
     //API方法
-    this.apiMethod = function (method, args) {
+    this.apiMethod = function (method, args, inputFiles) {
         return new Promise(function (resolve, reject) {
             httpPost(method, function (json) {
                 resolve(json);
-            },args);
+            }, args, inputFiles);
         });
     }
 }

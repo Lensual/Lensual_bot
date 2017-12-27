@@ -3,29 +3,50 @@ class qqModule {
     constructor() {
         this.Accounts = [];
     }
-    newAccount(callback) {
-        var qq = new QQ({});    //todo options
-        qq.on('msg', (msg) => {
+    //添加新的用户
+    async newAccount(message, callback) {
+        var qq = new QQ({
+            qrcodePath: "\\\\.\\NUL",
+            cookiePath: "\\\\.\\NUL"
+        });
+        qq.on("qr", async (path, qrcode) => {
+            var r = await this.bot.apiMethod("sendPhoto", {
+                chat_id: message.chat.id,
+                //photo: qrcode,
+                reply_to_message_id: message.message_id
+            }, [qrcode]);
+        });
+        qq.on("msg", (msg) => {
             console.log(JSON.stringify(msg));
         });
-        qq.on('buddy', (msg) => {
+        qq.on("buddy", (msg) => {
             qq.sendBuddyMsg(msg.id, `Hello, ${msg.name}`);
         });
         qq.run();
         this.Accounts.push(qq);
+        callback(qq);
     }
+    //注册tg消息监听器
     updateListener(event) {
-        event.on("newUpdate", this.newUpdateHandle);
-    }
-    newUpdateHandle(update) {
-        var params = update.message.text.split(" ");
-        if (params[0] === "/qq") {
-            switch (params[1]) {
-                case "add":
-                    
-                    break;
-                default:
-                    break;
+        event.on("newMsg", newMsgHandle);  //todo 修改接口
+        this.bot = event.bot;
+        var self = this;    //解决回调this问题
+
+        //新消息句柄
+        function newMsgHandle(message) {
+            var params = message.text.split(" ");
+            if (params[0] === "/qq") {
+                switch (params[1]) {
+                    case "add":
+                        //qrcode
+                        self.newAccount(message, function (qq) {
+                            qq.Master = message.from.id;
+                            console.log(qq.Master);
+                        });
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
