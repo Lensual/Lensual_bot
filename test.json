@@ -1,0 +1,159 @@
+﻿{
+    "ok": true,
+    "result": [
+        {
+            "update_id": 334303796,
+            "message": {
+                "message_id": 224,
+                "from": {
+                    "id": 255403161,
+                    "is_bot": false,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "language_code": "en"
+                },
+                "chat": {
+                    "id": 255403161,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "type": "private"
+                },
+                "date": 1514371531,
+                "text": "test"
+            }
+        },
+        {
+            "update_id": 334303797,
+            "message": {
+                "message_id": 225,
+                "from": {
+                    "id": 255403161,
+                    "is_bot": false,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "language_code": "en"
+                },
+                "chat": {
+                    "id": 255403161,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "type": "private"
+                },
+                "date": 1514371535,
+                "text": "test2"
+            }
+        },
+        {
+            "update_id": 334303798,
+            "message": {
+                "message_id": 226,
+                "from": {
+                    "id": 255403161,
+                    "is_bot": false,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "language_code": "en"
+                },
+                "chat": {
+                    "id": 255403161,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "type": "private"
+                },
+                "date": 1514371584,
+                "text": "test3"
+            }
+        },
+        {
+            "update_id": 334303799,
+            "edited_message": {
+                "message_id": 226,
+                "from": {
+                    "id": 255403161,
+                    "is_bot": false,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "language_code": "en"
+                },
+                "chat": {
+                    "id": 255403161,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "type": "private"
+                },
+                "date": 1514371584,
+                "edit_date": 1514371589,
+                "text": "test3 edited"
+            }
+        },
+        {
+            "update_id": 334303800,
+            "message": {
+                "message_id": 227,
+                "from": {
+                    "id": 255403161,
+                    "is_bot": false,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "language_code": "en"
+                },
+                "chat": {
+                    "id": 255403161,
+                    "first_name": "Lensual",
+                    "username": "Lensual",
+                    "type": "private"
+                },
+                "date": 1514371593,
+                "text": "test4"
+            }
+        },
+      {
+        "update_id": 334303801,
+        "message": {
+          "message_id": 228,
+          "from": {
+            "id": 255403161,
+            "is_bot": false,
+            "first_name": "Lensual",
+            "username": "Lensual",
+            "language_code": "en"
+          },
+          "chat": {
+            "id": 255403161,
+            "first_name": "Lensual",
+            "username": "Lensual",
+            "type": "private"
+          },
+          "date": 1514371600,
+          "sticker": {
+            "width": 512,
+            "height": 431,
+            "emoji": "👱",
+            "set_name": "ARU_full",
+            "thumb": {
+              "file_id": "AAQFABOOobMyAAQCRLtn6onFdsqkAQABAg",
+              "file_size": 4048,
+              "width": 128,
+              "height": 108
+            },
+            "file_id": "CAADBQADyAADwZuBCOxarTiP6SCnAg",
+            "file_size": 16126
+          }
+        }
+      },
+        {
+            "update_id": 334303802,
+            "channel_post": {
+                "message_id": 2,
+                "chat": {
+                    "id": -1001225201951,
+                    "title": "bottestchannel",
+                    "username": "bottestchannel2",
+                    "type": "channel"
+                },
+                "date": 1514372109,
+                "text": "ping test"
+            }
+        }
+    ]
+}
