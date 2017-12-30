@@ -1,92 +1,98 @@
-function TgBot(token) {
-    const https = require("https");
-    const querystring = require('querystring');
-    const EventEmitter = require('events');
-    const url = require("url");
-    const SocksProxyAgent = require("socks-proxy-agent");
+const https = require("https");
+const querystring = require('querystring');
+const EventEmitter = require('events');
+const url = require("url");
+const SocksProxyAgent = require("socks-proxy-agent");
 
-    const apiUrl = "https://api.telegram.org/bot";
+const apiUrl = "https://api.telegram.org/bot";
 
-    /****************
-    属性变量
-    *****************/
+class TgBot extends EventEmitter {
+    constructor(token) {
 
-    thisBot = this;
-    this.token = token;
-    this.proxy = "";
-    this.Me = {};
-    this.Status = "Down";
-    this.event = new EventEmitter();      //todo 继承
-    this.event.bot = this;
+        /****************
+        属性变量
+        *****************/
+
+        //this.this = this;
+        super();
+        this.token = token;
+        this.proxy = "";
+        this.Me = {};
+        this.Status = "Down";
+        //this.event = new EventEmitter();
+        //this.event.bot = this;
+    }
 
     /****************
     高级方法
     *****************/
 
     //Login
-    this.LoginSync = async function () {
-        var json = await thisBot.apiMethod("getMe");
+    async LoginSync() {
+        var json = await this.apiMethod("getMe");
         if (json && json.ok) {
-            thisBot.Me = json;
+            this.Me = json;
             return json;
         }
-        console.log(json);
+        console.log(json);  //for debug
         return false;
     }
 
     //启用Bot
-    this.Start = async function (updateMethod) {
-        if (thisBot.Status === "UP") return;
+    async Start(updateMethod) {
+        if (this.Status === "UP") return;
         switch (updateMethod.method) {
             case "polling":
                 //获取最后update_id
                 var offset = 0;
-                var lastUpdate = await thisBot.apiMethod("getUpdates", { offset: -1, timeout: 0 });
+                var lastUpdate = await this.apiMethod("getUpdates", { offset: -1, timeout: 0 });
                 if (lastUpdate.result.length) offset = lastUpdate.result[0].update_id + 1;
                 //开始工作
-                thisBot.Status = "UP";
-                updatePolling(offset, updateMethod.timeout);
+                this.Status = "UP";
+                TgBot.updatePolling(this, offset, updateMethod.timeout);
                 break;
             case "webhook":
                 break;
             default:
+                //err
                 break;
         }
     }
 
     //禁用Bot
-    this.Stop = function () {
-        thisBot.Status = "Down";
+    Stop() {
+        this.Status = "Down";
     }
 
     //加载模块
-    this.LoadModule = async function (module) {
+    LoadModule(module) {
         var m = new module();
-        m.updateListener(thisBot.event);
+        m.updateListener(this);
     }
+
 
     /****************
     Helper
     *****************/
 
     //消息更新轮询
-    async function updatePolling(offset, timeout) {
-        var updates = await thisBot.apiMethod("getUpdates", { offset: offset, timeout: timeout });
-        if (updates.ok && thisBot.Status === "UP") {
+    static async updatePolling(bot, offset, timeout) {
+        var updates = await bot.apiMethod("getUpdates", { offset: offset, timeout: timeout });
+        if (updates.ok && bot.Status === "UP") {
             //newUpdates事件
-            thisBot.event.emit("newUpdates", updates);
+            bot.emit("newUpdates", updates);
             //newUpdate事件
             for (var i = 0; i < updates.result.length; i++) {
-                thisBot.event.emit("newUpdate", updates.result[i]);
+                bot.emit("newUpdate", updates.result[i]);
                 if (updates.result[i].message) {
                     //newMsg Event
-                    thisBot.event.emit("newMsg", updates.result[i].message);
+                    bot.emit("newMsg", updates.result[i].message);
                 } else if (updates.result[i].edited_message) {
                     //newEditedMsg Event
-                    thisBot.event.emit("newEditedMsg", updates.result[i].edited_message);
+                    bot.emit("newEditedMsg", updates.result[i].edited_message);
                 } else if (updates.result[i].channel_post) {
                     //newChnPost Event
-                    thisBot.event.emit("newChnPost", updates.result[i].channel_post);
+                    bot.emit("newChnPost", updates.result[i].channel_post);
                 }
             }
             //更新offset
@@ -97,15 +103,15 @@ function TgBot(token) {
                 offset++;
             }
         }
-        if (thisBot.Status === "UP") setImmediate(updatePolling, offset, timeout);
+        if (bot.Status === "UP") setImmediate(TgBot.updatePolling, bot, offset, timeout);
     }
 
     //http Helper
-    function httpPost(method, callback, apiParams = {}, inputFiles) {
-        var opts = url.parse(apiUrl + token + "/" + method);
+    httpPost(method, callback, apiParams = {}, inputFiles) {
+        var opts = url.parse(apiUrl + this.token + "/" + method);
         //proxy TODO:http https
-        if (thisBot.proxy) {
-            opts.agent = new SocksProxyAgent(thisBot.proxy, true);
+        if (this.proxy) {
+            opts.agent = new SocksProxyAgent(this.proxy, true);
         }
         opts.method = "POST";
         if (inputFiles) {
@@ -146,12 +152,15 @@ function TgBot(token) {
     }
 
     //API方法
-    this.apiMethod = function (method, args, inputFiles) {
+    async apiMethod(method, args, inputFiles) {
+        var self = this;
         return new Promise(function (resolve, reject) {
-            httpPost(method, function (json) {
+            self.httpPost(method, function (json) {
                 resolve(json);
             }, args, inputFiles);
         });
     }
+
 }
+
 module.exports = TgBot;

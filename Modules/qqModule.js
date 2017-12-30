@@ -27,10 +27,10 @@ class qqModule {
         callback(qq);
     }
     //注册tg消息监听器
-    updateListener(event) {
-        event.on("newMsg", newMsgHandle);  //todo 修改接口
-        this.bot = event.bot;
+    updateListener(bot) {
+        this.bot = bot;
         var self = this;    //解决回调this问题
+        bot.on("newMsg", newMsgHandle);  //todo 修改接口
 
         //新消息句柄
         function newMsgHandle(message) {

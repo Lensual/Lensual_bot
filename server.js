@@ -16,7 +16,7 @@ async function main() {
     console.log(bot.Me);
 
     //接收消息事件 //TO Delete
-    bot.event.on("newUpdate", function (update) {
+    bot.on("newUpdate", function (update) {
         console.log(update);
         //复读机模式
         //bot.apiMethod("sendMessage", { chat_id: update.message.chat.id, text: update.message.text });
