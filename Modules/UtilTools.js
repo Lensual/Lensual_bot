@@ -10,6 +10,7 @@
         bot.on("newMsg", newMsgHandle);
 
         function newMsgHandle(message) {
+            if (!message.text) return;
             var arr = message.text.split(self.bot.Me.result.username);
             var params = message.text.split(" ");
             switch (params[0]) {

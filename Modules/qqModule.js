@@ -34,6 +34,7 @@ class qqModule {
 
         //新消息句柄
         function newMsgHandle(message) {
+            if (!message.text) return;
             var params = message.text.split(" ");
             if (params[0] === "/qq") {
                 switch (params[1]) {
