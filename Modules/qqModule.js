@@ -30,7 +30,7 @@ class qqModule {
     updateListener(bot) {
         this.bot = bot;
         var self = this;    //解决回调this问题
-        bot.on("newMsg", newMsgHandle);  //todo 修改接口
+        bot.on("newMsg", newMsgHandle);
 
         //新消息句柄
         function newMsgHandle(message) {

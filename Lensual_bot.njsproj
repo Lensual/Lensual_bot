@@ -19,6 +19,9 @@
     <Compile Include="Modules\qqModule.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Modules\UtilTools.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TgBot.js" />
     <Compile Include="config.js" />
     <Compile Include="server.js" />

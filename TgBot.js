@@ -13,14 +13,11 @@ class TgBot extends EventEmitter {
         属性变量
         *****************/
 
-        //this.this = this;
         super();
         this.token = token;
         this.proxy = "";
         this.Me = {};
         this.Status = "Down";
-        //this.event = new EventEmitter();
-        //this.event.bot = this;
     }
 
     /****************
@@ -34,7 +31,6 @@ class TgBot extends EventEmitter {
             this.Me = json;
             return json;
         }
-        console.log(json);  //for debug
         return false;
     }
 
@@ -129,7 +125,6 @@ class TgBot extends EventEmitter {
             res.on("data", function (chunk) { rawData += chunk; });
             res.on("end", function () {
                 callback(JSON.parse(rawData));
-                console.log(rawData);
             });
         });
         req.on('error', (e) => {
